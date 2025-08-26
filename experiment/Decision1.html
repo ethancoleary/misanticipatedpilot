@@ -1,0 +1,41 @@
+{{ block title }}
+    Decision 1: Your Application Decision
+{{ endblock }}
+
+{{ block content }}
+<p>
+<b>Your productivity value: {{ player.productivity_value }} </b> <br>
+<b>Your group: {{ color }} </b>
+</p>
+
+<p>
+    You will receive the cash value of the following based on your decision:
+<ol>
+    <li><b>Apply for job:</b> 200 tokens if hired, 0 tokens if not hired (only 4 people in your society will be hired).</li>
+    <li><b>Take productivity value:</b> {{ player.productivity_value }} tokens. </li>
+</ol>
+</p>
+<p>There are 15 other individuals in your society who also make the same choice determining the pool of applicants to the job.</p>
+<form method="post">
+  <h4><strong>What is your choice?</strong></h4>
+
+  <div style="margin: 20px 0;">
+    <label style="display: block; margin: 10px 0; font-size: 16px;">
+      <input type="radio" name="apply" value="1" style="margin-right: 10px;">
+      Apply for the job
+    </label>
+
+    <label style="display: block; margin: 10px 0; font-size: 16px;">
+      <input type="radio" name="apply" value="0" style="margin-right: 10px;">
+      Take your productivity value
+    </label>
+  </div>
+
+  <div style="text-align: center; margin-top: 30px;">
+    <button type="submit" class="btn btn-primary">Submit Choice</button>
+  </div>
+</form>
+
+{{ endblock }}
+
+

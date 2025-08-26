@@ -1,0 +1,111 @@
+{{ block title }}Quiz: Comprehension Check 2{{ endblock }}
+
+{{ block styles }}
+<style>
+.reveal-section { margin:20px 0; border:1px solid #ddd; border-radius:6px; overflow:hidden; }
+.reveal-header { background:#f8f9fa; padding:12px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+.reveal-header.disabled { opacity:.5; cursor:not-allowed; }
+.reveal-header.active  { background:#28a745; color:#fff; }
+.reveal-content { display:none; padding:16px; border-top:1px solid #ddd; }
+.reveal-content.show { display:block; }
+.step-number { width:20px; height:20px; border-radius:50%; background:#007bff; color:#fff; display:inline-flex; align-items:center; justify-content:center; margin-right:8px; }
+.step-number.completed { background:#28a745; }
+.check-button { margin-top:10px; }
+</style>
+{{ endblock }}
+
+{{ block content }}
+<form method="post">
+  <p><strong>You must answer each question correctly to unlock the next.</strong></p>
+
+  <!-- QUESTION 7 -->
+  <div class="reveal-section" id="q7-section">
+    <div class="reveal-header active" onclick="openSection(7)">
+      <div><span class="step-number" id="step7">7</span> Question 7</div>
+      <div>▼</div>
+    </div>
+    <div class="reveal-content" id="q7-content">
+      <h4>How does Robot A adjust Green applicant signals?</h4>
+      {{ form.quiz_q7 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer2(7)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 8 -->
+  <div class="reveal-section" id="q8-section">
+    <div class="reveal-header disabled" onclick="openSection(8)">
+      <div><span class="step-number" id="step8">8</span> Question 8</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q8-content">
+      <h4>Which information does Robot B use to estimate productivity?</h4>
+      {{ form.quiz_q8 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer2(8)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 9 -->
+  <div class="reveal-section" id="q9-section">
+    <div class="reveal-header disabled" onclick="openSection(9)">
+      <div><span class="step-number" id="step9">9</span> Question 9</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q9-content">
+      <h4>What do you know about which robot is used?</h4>
+      {{ form.quiz_q9 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer2(9)">Check Answer</button>
+    </div>
+  </div>
+
+  <div id="submit-container" style="display:none;text-align:center;margin-top:20px;">
+    <button type="submit" class="btn btn-primary">Submit Answers</button>
+  </div>
+</form>
+
+<script>
+// Pass arrays from init via vars_for_template
+const C2_CORRECT = {{ correct_answers2|json }};
+const C2_ERRORS  = {{ error_messages2|json }};
+
+// Show Q7 content initially
+document.getElementById('q7-content').classList.add('show');
+
+function openSection(n) {
+  const header = document.querySelector(`#q${n}-section .reveal-header`);
+  if (!header.classList.contains('disabled')) {
+    document.getElementById(`q${n}-content`).classList.toggle('show');
+  }
+}
+
+function checkAnswer2(n) {
+  // read selected value
+  const inputs = document.querySelectorAll(`#q${n}-content input`);
+  let val = null;
+  inputs.forEach(i => { if (i.checked) val = parseInt(i.value); });
+
+  if (val === C2_CORRECT[n-7]) {
+    // mark complete
+    const section = document.getElementById(`q${n}-section`);
+    const header  = section.querySelector('.reveal-header');
+    const step    = section.querySelector('.step-number');
+    header.classList.add('active');
+    header.classList.remove('disabled');
+    step.classList.add('completed');
+    // unlock next
+    if (n < 9) {
+      const nextHeader = document.querySelector(`#q${n+1}-section .reveal-header`);
+      nextHeader.classList.remove('disabled');
+      openSection(n+1);
+    } else {
+      // all done
+      document.getElementById('submit-container').style.display = 'block';
+    }
+  } else {
+    alert(C2_ERRORS[n-7]);
+  }
+}
+</script>
+ {{ endblock }}

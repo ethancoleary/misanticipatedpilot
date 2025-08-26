@@ -1,0 +1,232 @@
+{{ block title }}Productivity Values (Instructions Page 2/4){{ endblock }}
+
+{{ block styles }}
+<style>
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+.urn-image-container { text-align: center; margin: 20px 0; }
+.urn-image { max-width: 100px; height: auto; }
+.urn-description { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.urn-explorer { background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 30px 0; }
+.histogram-container { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+.slider-container { margin: 20px 0; text-align: center; }
+.slider { width: 80%; height: 8px; background: #ddd; outline: none; border-radius: 4px; }
+.slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #2196F3; border-radius: 50%; cursor: pointer; }
+.slider-value { text-align: center; margin: 10px 0; font-weight: bold; font-size: 16px; }
+.results-display { display: flex; justify-content: space-around; margin-top: 20px; }
+.result-box { background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+.result-label { display: block; font-size: 14px; color: #666; }
+.result-number { font-size: 24px; font-weight: bold; color: #2196F3; }
+.result-number.orange { color: #ff9800; }
+.your-value { padding: 20px; margin: 20px 0; text-align: center; }
+.your-value h4 { font-size: 24px; font-weight: bold; margin-bottom: 15px; }
+.your-value p { font-size: 20px; font-weight: bold; }
+.decision-explanation { background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0; }
+
+/* Progressive reveal */
+.reveal-section { margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+.reveal-header { background: #f8f9fa; padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s ease; }
+.reveal-header:hover { background: #e9ecef; }
+.reveal-header.active { background: #007bff; color: white; }
+.reveal-header.disabled { opacity: 0.5; cursor: not-allowed; }
+.reveal-title { font-weight: bold; font-size: 18px; }
+.reveal-arrow { font-size: 14px; transition: transform 0.3s ease; }
+.reveal-arrow.rotated { transform: rotate(90deg); }
+.reveal-content { display: none; padding: 0; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.reveal-content.show { display: block; padding: 20px; max-height: none; }
+.step-number { background: #007bff; color: white; border-radius: 50%; width: 25px; height: 25px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; margin-right: 10px; }
+.step-number.completed { background: #28a745; }
+</style>
+{{ endblock }}
+
+{{ block content }}
+<div class="container">
+  <p>Each participant is given a <strong>productivity value</strong>. Below we describe how this value is allocated.</p>
+
+  <!-- Section 1 -->
+  <div class="reveal-section" id="section1">
+    <div class="reveal-header" onclick="revealSection(1)">
+      <div><span class="step-number" id="step1">1</span><span class="reveal-title">Understanding the Productivity Urn</span></div>
+      <span class="reveal-arrow">▶</span>
+    </div>
+    <div class="reveal-content">
+      <h3>The Productivity Urn:</h3>
+      <div class="urn-image-container">
+        <img src="{% static 'productivity_urn_single.png' %}" alt="Productivity Urn" class="urn-image"><br>
+        <center>
+          Productivity Urn<br>1000 balls<br>Average ball value: 100
+        </center>
+      </div>
+      <div class="urn-description">
+        <ul>
+          <li>Imagine an urn containing <strong>1,000 balls</strong>, each with a <strong>whole</strong> number written on them (e.g. 1, 5, 10).</li>
+          <li><strong>Half</strong> the balls have a number at or below 100.</li>
+          <li> <strong>Half</strong> have a number at or above 100.</li>
+          <li><strong>683 balls</strong> have a number between 0 and 200.</li>
+          <li>There are some balls with negative numbers and some with very high numbers.</li>
+          <li>The average number of all the balls in the urn is <strong>100</strong>.</li>
+        </ul>
+      </div>
+      <p>Each participant draws <strong>one ball</strong>; that is your <strong>productivity value</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="reveal-section" id="section2">
+    <div class="reveal-header disabled" onclick="revealSection(2)">
+      <div><span class="step-number" id="step2">2</span><span class="reveal-title">Explore the Productivity Distribution</span></div>
+      <span class="reveal-arrow">▶</span>
+    </div>
+    <div class="reveal-content">
+      <p><em>Slide to any value and see how many balls are above/below it.</em></p>
+      <div class="urn-explorer">
+        <h4>Explore the Productivity Urn:</h4>
+        <div class="histogram-container">
+          <canvas id="productivityChart" width="600" height="350"></canvas>
+        </div>
+        <div class="slider-container">
+          <label for="productivitySlider">Slide to explore values:</label>
+          <input type="range" id="productivitySlider" min="-50" max="250" value="100" class="slider">
+          <div class="slider-value">Current value: <span id="sliderValue">100</span></div>
+        </div>
+        <div class="results-display">
+          <div class="result-box">
+            <span class="result-label">Balls ≤ <span id="belowValue">100</span>:</span>
+            <span class="result-number orange" id="ballsBelow">500</span>
+          </div>
+          <div class="result-box">
+            <span class="result-label">Balls ≥ <span id="aboveValue">100</span>:</span>
+            <span class="result-number" id="ballsAbove">500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="reveal-section" id="section3">
+    <div class="reveal-header disabled" onclick="revealSection(3)">
+      <div><span class="step-number" id="step3">3</span><span class="reveal-title">Your Productivity Value</span></div>
+      <span class="reveal-arrow">▶</span>
+    </div>
+    <div class="reveal-content">
+      <div class="your-value">
+        <h4>You have drawn a productivity value of {{ player.productivity_value }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="reveal-section" id="section4">
+    <div class="reveal-header disabled" onclick="revealSection(4)">
+      <div><span class="step-number" id="step4">4</span><span class="reveal-title">Your Application Decision (Decision 1)</span></div>
+      <span class="reveal-arrow">▶</span>
+    </div>
+    <div class="reveal-content">
+      <div class="decision-explanation">
+        <h4>Your application decision (Decision 1)</h4>
+        <p>You must first decide if you wish to apply for a job.</p>
+        <p>If you choose <strong>not to apply</strong>, your bonus equals your productivity value ({{ player.productivity_value }} tokens).</p>
+        <p>If you choose to <strong>apply</strong>, the employer hires <strong>4 applicants</strong>:
+           hired = 200 tokens; not hired = 0 tokens.</p>
+        <p>Next page: How the employer chooses hires.</p>
+        <div id="nextButtonContainer" style="display:none; text-align:center; margin-top:30px;">
+          {{ next_button }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// Progressive reveal
+let currentSection=0, revealed=[false,false,false,false];
+function revealSection(n){
+  if(n>currentSection+1) return;
+  if(revealed[n-1]) return;
+  // visuals
+  const sec=document.getElementById(`section${n}`),
+        hdr=sec.querySelector('.reveal-header'),
+        cnt=sec.querySelector('.reveal-content'),
+        arr=sec.querySelector('.reveal-arrow'),
+        stp=sec.querySelector('.step-number');
+  hdr.classList.add('active'); hdr.classList.remove('disabled');
+  cnt.classList.add('show'); arr.classList.add('rotated');
+  stp.classList.add('completed');
+  revealed[n-1]=true; currentSection=n;
+  if(n<4) document.querySelector(`#section${n+1} .reveal-header`).classList.remove('disabled');
+  if(n===4) document.getElementById('nextButtonContainer').style.display='block';
+  if(n===2){
+    setTimeout(()=>{
+      drawProductivityChart();
+      document.getElementById('productivitySlider').addEventListener('input', updateProductivityDisplay);
+    },100);
+  }
+}
+
+// CDF helper
+const PRODUCTIVITY_MEAN=100, PRODUCTIVITY_SD=100;
+function normalCDF(x,mean,sd){
+  const z=(x-mean)/sd; return .5*(1+erf(z/Math.sqrt(2)));
+}
+function erf(x){
+  const a1=.254829592,a2=-.284496736,a3=1.421413741,a4=-1.453152027,
+        a5=1.061405429,p=0.3275911,sign=x<0?-1:1;
+  x=Math.abs(x);const t=1/(1+p*x);
+  const y=1-((((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
+  return sign*y;
+}
+
+// Update slider display
+function updateProductivityDisplay(){
+  const v=parseInt(document.getElementById('productivitySlider').value),
+        p=normalCDF(v,PRODUCTIVITY_MEAN,PRODUCTIVITY_SD),
+        below=Math.round(p*1000), above=1000-below;
+  document.getElementById('sliderValue').textContent=v;
+  document.getElementById('belowValue').textContent=v;
+  document.getElementById('aboveValue').textContent=v;
+  document.getElementById('ballsBelow').textContent=below;
+  document.getElementById('ballsAbove').textContent=above;
+  drawProductivityChart(v);
+}
+
+// Draw histogram with ticks
+function drawProductivityChart(highlight=null){
+  const c=document.getElementById('productivityChart'), ctx=c.getContext('2d'),
+        W=c.width, H=c.height-50;
+  ctx.clearRect(0,0,c.width,c.height);
+  const bars=50,minX=-50,maxX=250,bW=W/bars;
+  for(let i=0;i<bars;i++){
+    const x=minX+(maxX-minX)*(i/bars),
+          nx=minX+(maxX-minX)*((i+1)/bars),
+          prob=normalCDF(nx,PRODUCTIVITY_MEAN,PRODUCTIVITY_SD)
+               -normalCDF(x,PRODUCTIVITY_MEAN,PRODUCTIVITY_SD),
+          h=prob*H*8;
+    ctx.fillStyle=(highlight!==null&&x<=highlight)?'#ff9800':'#2196f3';
+    ctx.fillRect(i*bW, H-h, bW-1, h);
+  }
+  // highlight line
+  if(highlight!==null){
+    const lx=((highlight-minX)/(maxX-minX))*W;
+    ctx.strokeStyle='#f44336'; ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(lx,0);ctx.lineTo(lx,H);ctx.stroke();
+  }
+  // x-axis
+  ctx.strokeStyle='#000'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(W,H);ctx.stroke();
+  // ticks & labels
+  const ticks=[0,50,100,150,200];
+  ctx.fillStyle='#000'; ctx.font='12px Arial';
+  ticks.forEach(val=>{
+    const xPos=((val-minX)/(maxX-minX))*W;
+    ctx.beginPath();ctx.moveTo(xPos,H);ctx.lineTo(xPos,H-8);ctx.stroke();
+    const txt=val.toString(),tw=ctx.measureText(txt).width;
+    ctx.fillText(txt, xPos-tw/2, H+20);
+  });
+  // y-axis label
+  ctx.save();ctx.rotate(-Math.PI/2);
+  ctx.fillText('Frequency of ball numbers', -H/2-20, 15);
+  ctx.restore();
+}
+</script>
+{{ endblock }}

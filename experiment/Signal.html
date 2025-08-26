@@ -1,0 +1,268 @@
+{{ block title }}How Signals Work (Instructions Page 3/4){{ endblock }}
+
+{{ block styles }}
+<style>
+/* --- Layout and generic styles ----------------------------------------- */
+.container         { max-width:900px;margin:0 auto;padding:20px; }
+.urn-image         { max-width:100%;height:auto; }
+.center            { text-align:center; }
+
+.reveal-section    { margin:20px 0;border:1px solid #ddd;border-radius:8px;overflow:hidden; }
+.reveal-header     { background:#f8f9fa;padding:15px 20px;cursor:pointer;
+                     display:flex;justify-content:space-between;align-items:center;
+                     transition:background .3s; }
+.reveal-header:hover          { background:#e9ecef; }
+.reveal-header.active         { background:#007bff;color:#fff; }
+.reveal-header.disabled       { opacity:.5;cursor:not-allowed; }
+.reveal-title      { font-weight:bold;font-size:18px; }
+.reveal-arrow      { transition:transform .3s; }
+.reveal-arrow.rotated          { transform:rotate(90deg); }
+.reveal-content    { display:none;max-height:0;overflow:hidden;transition:max-height .3s ease; }
+.reveal-content.show           { display:block;padding:20px;max-height:none; }
+
+.step-number       { width:25px;height:25px;border-radius:50%;font-size:14px;
+                     display:inline-flex;align-items:center;justify-content:center;
+                     background:#007bff;color:#fff;font-weight:bold;margin-right:10px; }
+.step-number.completed        { background:#28a745; }
+
+/* --- Dual-urn table ----------------------------------------------------- */
+.signal-table      { width:100%;border-collapse:collapse;border:1px solid #ddd; }
+.signal-table td   { border:1px solid #ddd;padding:20px;vertical-align:top; }
+.image-row         { background:#ffffff;text-align:center; }
+
+.urn-diagram-container        { position:relative;display:inline-block; }
+.productivity-value-label,
+.signal-average-label         { position:absolute;background:#fff;border:2px solid #333;
+                                box-shadow:0 2px 5px rgba(0,0,0,.3);font-weight:bold; }
+.productivity-value-label     { left:25%;top:60%;padding:3px 8px;border-radius:10px; font-size:18px;
+                                transform:translate(-50%,-50%); }
+.productivity-value-label::before { content:"Your draw from the productivity urn: ";font-weight:normal; }
+.signal-average-label         { left:75%;top:60%;padding:3px 8px;border-radius:10px;font-size:18px;
+                                transform:translate(-50%,-50%); }
+.signal-average-label::before { content:"Average ball number in your signal urn = ";font-weight:normal; }
+
+.left-col          { background:#f8f9fa; }
+.right-col-blue    { background:#e3f2fd;text-align:center; }  /* ✅ BLUE SHADED */
+
+/* Additional styles for histogram and slider */
+.histogram-container { background:#f8f9fa;padding:20px;border-radius:8px;text-align:center;margin:20px 0; }
+.slider-container { margin:20px 0;text-align:center; }
+.slider { width:80%;height:8px;background:#ddd;outline:none;border-radius:4px; }
+.slider::-webkit-slider-thumb { appearance:none;width:20px;height:20px;background:#2196F3;border-radius:50%;cursor:pointer; }
+.slider-value { text-align:center;margin:10px 0;font-weight:bold;font-size:16px; }
+.results-display { display:flex;justify-content:space-around;margin-top:20px; }
+.result-box { background:white;padding:15px;border-radius:6px;box-shadow:0 2px 4px rgba(0,0,0,0.1);text-align:center; }
+.result-label { display:block;font-size:14px;color:#666; }
+.result-number { font-size:24px;font-weight:bold;color:#2196F3; }
+.result-number.orange { color:#ff9800; }
+
+@media(max-width:768px){
+  .signal-table td{display:block;width:100%;}
+  .productivity-value-label,.signal-average-label{font-size:12px;padding:3px 6px;}
+}
+</style>
+{{ endblock }}
+
+{{ block content }}
+<div class="container">
+
+<p>The <b>employer</b> never sees your true productivity value.
+Instead, they observe a <b>signal</b> – a noisy estimate of that value.</p>
+
+<!-- ========== SECTION 1 ================================================= -->
+<div class="reveal-section" id="section1">
+  <div class="reveal-header" onclick="revealSection(1)">
+      <div><span class="step-number" id="step1">1</span>
+           <span class="reveal-title">Productivity vs Signal Urns</span></div>
+      <span class="reveal-arrow">▶</span>
+  </div>
+
+  <div class="reveal-content">
+      <!-- Dual-urn table -->
+      <table class="signal-table">
+    <!-- Row 1: Image row (was previously Row 2) -->
+    <tr class="image-row"><td colspan="2">
+        <div class="urn-diagram-container">
+            <img src="{% static 'signal_urn.png' %}" alt="Productivity and Signal Urns" class="urn-image">
+            <div class="productivity-value-label">{{ player.productivity_value }}</div>
+            <div class="signal-average-label">{{ player.productivity_value }}</div>
+        </div>
+    </td></tr>
+
+    <!-- Row 2: Content columns (was previously Row 3) -->
+    <tr class="content-row">
+        <!-- Left cell -->
+        <td class="left-col">
+            <p class="center"><b>Productivity Urn</b><br>
+               1 000 balls<br>
+               Average = 100</p>
+        </td>
+
+        <!-- Right cell - NOW BLUE SHADED -->
+        <td class="right-col-blue">
+            <p class="center"><b>YOUR Signal Urn</b><br>
+               1 000 balls<br>
+               Average = {{ player.productivity_value }}</p>
+        </td>
+    </tr>
+</table>
+<p>
+      <ol>
+          <li>You drew <b>{{ player.productivity_value }}</b> from the productivity urn.</li>
+          <li>Now imagine a <b>second urn</b> created specifically for you:</li>
+          <ol>
+              <li>This second urn contains <b>1,000 balls</b>.</li>
+              <li>The <b>average ball number</b> in your second urn equals your productivity value {{ player.productivity_value }}.</li>
+              <li>The numbers are <b>spread around</b> your productivity value (some higher, some lower but most are close to the average).</li>
+              <li><b>Half the balls</b> have numbers <b>at or below</b> your productivity value.</li>
+              <li><b>Half the balls</b> have numbers <b>at or above</b> your productivity value.</li>
+              <li><b>683 balls</b> have numbers between {{ prod_min }} and {{ prod_max }}.</li>
+          </ol>
+          <li>If you apply, the employer draws <b>one</b> ball from that urn; that draw is your <b>signal</b>.</li>
+      </ol>
+      </p>
+  </div>
+</div>
+
+<!-- ========== SECTION 2 ================================================= -->
+<div class="reveal-section" id="section2">
+  <div class="reveal-header disabled" onclick="revealSection(2)">
+      <div><span class="step-number" id="step2">2</span>
+           <span class="reveal-title">Explore YOUR Signal Distribution</span></div>
+      <span class="reveal-arrow">▶</span>
+  </div>
+
+  <div class="reveal-content">
+      <p><em>This tool is calibrated specifically to your productivity value ({{ player.productivity_value }}).
+          Use it to explore your personal signal distribution: slide to any value and see how many of the 1,000 balls in YOUR signal urn are above or below that number.</em></p>
+
+      <div class="histogram-container"><canvas id="signalChart" width="600" height="300"></canvas></div>
+
+  <div class="slider-container">
+      <label for="signalSlider">Slide to explore values:</label>
+      <input type="range" id="signalSlider"
+          min="{{ slider_min }}"
+          max="{{ slider_max }}"
+          value="{{ user_productivity }}" class="slider">
+      <div class="slider-value">Current value: <span id="sliderVal">{{ user_productivity }}</span></div>
+  </div>
+
+      <div class="results-display">
+          <div class="result-box">
+              <span class="result-label">Balls at or below <span id="belowVal">{{ player.productivity_value }}</span>:</span>
+              <span class="result-number orange" id="ballsBelow">500</span>
+          </div>
+          <div class="result-box">
+              <span class="result-label">Balls above <span id="aboveVal">{{ player.productivity_value }}</span>:</span>
+              <span class="result-number" id="ballsAbove">500</span>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- ========== SECTION 3 ================================================= -->
+<div class="reveal-section" id="section3">
+  <div class="reveal-header disabled" onclick="revealSection(3)">
+      <div><span class="step-number" id="step3">3</span>
+           <span class="reveal-title">Key Points Summary</span></div>
+      <span class="reveal-arrow">▶</span>
+  </div>
+
+  <div class="reveal-content">
+      <ul style="list-style:disc;padding-left:25px;">
+          <li>For each applicant, the employer sees only <b>Group colour</b> and <b>Signal</b>.</li>
+          <li>Your true productivity remains hidden.</li>
+          <li>You never see which signal the employer draws.</li>
+      </ul>
+
+      <!-- NEXT button appears here after Section 3 opens -->
+      <div style="text-align:center;margin-top:25px;">
+          {{ next_button }}
+      </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ---------- Progressive reveal ----------------------------------------- */
+let revealed=[false,false,false];             // three sections
+function revealSection(n){
+   if(n>1 && !revealed[n-2]) return;          // gate-keeping
+   if(revealed[n-1]) return;                  // already open
+
+   const header=document.querySelector(`#section${n} .reveal-header`);
+   const content=document.querySelector(`#section${n} .reveal-content`);
+   const arrow=document.querySelector(`#section${n} .reveal-arrow`);
+   const step=document.querySelector(`#step${n}`);
+
+   header.classList.add('active'); header.classList.remove('disabled');
+   content.classList.add('show');   arrow.classList.add('rotated');
+   step.classList.add('completed');
+   revealed[n-1]=true;
+
+   if(n<3){ document.querySelector(`#section${n+1} .reveal-header`)
+            .classList.remove('disabled'); }
+
+   if(n===2) initSignalChart();     // build chart when section 2 opens
+}
+
+/* ---------- Signal distribution display -------------------------------- */
+const USER_PRODUCTIVITY = {{ user_productivity }};
+const SIGNAL_SD = 100;                        // variance of signal
+
+/* Normal CDF helper */
+function normalCDF(x,mean,sd){
+   const z=(x-mean)/sd;
+   return .5*(1+erf(z/Math.sqrt(2)));
+}
+function erf(x){ const a1=.254829592,a2=-.284496736,a3=1.421413741,
+      a4=-1.453152027,a5=1.061405429,p=.3275911, sign=x<0?-1:1;
+      x=Math.abs(x); const t=1/(1+p*x);
+      const y=1-((((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
+      return sign*y; }
+
+/* Draw histogram */
+function drawChart(highlight=null){
+   const c=document.getElementById('signalChart'),ctx=c.getContext('2d');
+   ctx.clearRect(0,0,c.width,c.height);
+   const bars=50,min=USER_PRODUCTIVITY-200,max=USER_PRODUCTIVITY+200,
+         bw=c.width/bars;
+   for(let i=0;i<bars;i++){
+      const x=min+(max-min)*(i/bars),
+            nx=min+(max-min)*((i+1)/bars),
+            p=normalCDF(nx,USER_PRODUCTIVITY,SIGNAL_SD)-
+              normalCDF(x,USER_PRODUCTIVITY,SIGNAL_SD),
+            h=p*c.height*8;
+      ctx.fillStyle=(highlight!==null && x<=highlight)?'#ff9800':'#2196f3';
+      ctx.fillRect(i*bw,c.height-h,bw-1,h);
+   }
+   if(highlight!==null){
+      const hx=((highlight-min)/(max-min))*c.width;
+      ctx.strokeStyle='#f44336';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(hx,0);ctx.lineTo(hx,c.height);ctx.stroke();
+   }
+}
+
+/* Update counts */
+function updateDisplay(){
+   const v=parseInt(document.getElementById('signalSlider').value);
+   const p=normalCDF(v,USER_PRODUCTIVITY,SIGNAL_SD),
+         below=Math.round(p*1000), above=1000-below;
+   ['sliderVal','aboveVal','belowVal'].forEach(id=>{
+       document.getElementById(id).textContent=v; });
+   document.getElementById('ballsBelow').textContent=below;
+   document.getElementById('ballsAbove').textContent=above;
+   drawChart(v);
+}
+
+/* Build chart once Section 2 opens */
+function initSignalChart(){
+   drawChart();
+   document.getElementById('signalSlider')
+           .addEventListener('input',updateDisplay);
+}
+
+/* ----------------------------------------------------------------------- */
+</script>
+{{ endblock }}

@@ -1,0 +1,161 @@
+{{ block title }}Quiz: Comprehension Check{{ endblock }}
+
+{{ block styles }}
+<style>
+.reveal-section { margin:20px 0; border:1px solid #ddd; border-radius:6px; overflow:hidden; }
+.reveal-header { background:#f8f9fa; padding:12px 16px; cursor:pointer;
+                 display:flex; justify-content:space-between; align-items:center; }
+.reveal-header.disabled { opacity:.5; cursor:not-allowed; }
+.reveal-header.active  { background:#28a745; color:#fff; }
+.reveal-content { display:none; padding:16px; border-top:1px solid #ddd; }
+.reveal-content.show { display:block; }
+.step-number { width:20px; height:20px; border-radius:50%;
+                background:#007bff; color:#fff; display:inline-flex;
+                align-items:center; justify-content:center; margin-right:8px; }
+.step-number.completed { background:#28a745; }
+.check-button { margin-top:10px; }
+</style>
+{{ endblock }}
+
+{{ block content }}
+<form method="post">
+  <p><strong>You must answer each question correctly to unlock the next.</strong></p>
+
+  <!-- QUESTION 1 -->
+  <div class="reveal-section" id="q1-section">
+    <div class="reveal-header active" onclick="openSection(1)">
+      <div><span class="step-number" id="step1">1</span> Question 1</div>
+      <div>▼</div>
+    </div>
+    <div class="reveal-content" id="q1-content">
+      <h4>How many people are in your society?</h4>
+      {{ form.quiz_q1 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer(1)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 2 -->
+  <div class="reveal-section" id="q2-section">
+    <div class="reveal-header disabled" onclick="openSection(2)">
+      <div><span class="step-number" id="step2">2</span> Question 2</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q2-content">
+      <h4>What is the expected average productivity value in your society?</h4>
+      {{ form.quiz_q2 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer(2)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 3 -->
+  <div class="reveal-section" id="q3-section">
+    <div class="reveal-header disabled" onclick="openSection(3)">
+      <div><span class="step-number" id="step3">3</span> Question 3</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q3-content">
+      <h4>True or False: It is possible to draw a negative productivity value.</h4>
+      {{ form.quiz_q3 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer(3)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 4 -->
+  <div class="reveal-section" id="q4-section">
+    <div class="reveal-header disabled" onclick="openSection(4)">
+      <div><span class="step-number" id="step4">4</span> Question 4</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q4-content">
+      <h4>True or False: Everybody who applies draws a signal from the
+same signal urn?</h4>
+      {{ form.quiz_q4 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer(4)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 5 -->
+  <div class="reveal-section" id="q5-section">
+    <div class="reveal-header disabled" onclick="openSection(5)">
+      <div><span class="step-number" id="step5">5</span> Question 5</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q5-content">
+      <h4>How many people from your society will be hired?</h4>
+      {{ form.quiz_q5 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer(5)">Check Answer</button>
+    </div>
+  </div>
+
+  <!-- QUESTION 6 -->
+  <div class="reveal-section" id="q6-section">
+    <div class="reveal-header disabled" onclick="openSection(6)">
+      <div><span class="step-number" id="step6">6</span> Question 6</div>
+      <div>▶</div>
+    </div>
+    <div class="reveal-content" id="q6-content">
+      <h4>Your signal urn is: (select one)</h4>
+      {{ form.quiz_q6 }}
+      <button type="button" class="check-button btn btn-sm btn-primary"
+              onclick="checkAnswer(6)">Check Answer</button>
+    </div>
+  </div>
+
+  <div id="submit-container" style="display:none;text-align:center;margin-top:20px;">
+    <button type="submit" class="btn btn-primary">Submit Answers</button>
+  </div>
+</form>
+
+
+<script>
+// Arrays passed in via vars_for_template
+const C_CORRECT = {{ correct_answers|json }};
+const C_ERRORS  = {{ error_messages|json }};
+
+// Show Q1 content initially
+document.getElementById('q1-content').classList.add('show');
+
+function openSection(n) {
+    const header = document.querySelector(`#q${n}-section .reveal-header`);
+    if (!header.classList.contains('disabled')) {
+        document.getElementById(`q${n}-content`).classList.toggle('show');
+    }
+}
+
+function checkAnswer(n) {
+    // Read selected value
+    const inputs = document.querySelectorAll(`#q${n}-content input`);
+    let val = null;
+    inputs.forEach(i => { if (i.checked) val = parseInt(i.value); });
+
+    if (val === C_CORRECT[n-1]) {
+        // Mark this question complete
+        const section = document.getElementById(`q${n}-section`);
+        const header  = section.querySelector('.reveal-header');
+        const step    = section.querySelector('.step-number');
+        header.classList.add('active');
+        header.classList.remove('disabled');
+        step.classList.add('completed');
+
+        // Unlock and immediately reveal the next question
+        if (n < C_CORRECT.length) {
+            const nextHeader = document.querySelector(`#q${n+1}-section .reveal-header`);
+            nextHeader.classList.remove('disabled');
+            openSection(n+1);
+        } else {
+            // All done, show submit
+            document.getElementById('submit-container').style.display = 'block';
+        }
+    } else {
+        // Show tailored error message
+        alert(C_ERRORS[n-1]);
+    }
+}
+</script>
+
+{{ endblock }}

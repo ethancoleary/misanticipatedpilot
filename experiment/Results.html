@@ -1,0 +1,28 @@
+{{ block title }}
+    Thank You
+{{ endblock }}
+
+{{ block content }}
+
+<p>You have now completed the experiment.
+    <!-- Round Z was randomly selected to determine your bonus payment. -->
+</p>
+<p>
+{{ if player.apply == 1 }}
+    You chose to apply for the job.
+    The selected robot will determine which applicants in your society to hire for the employer.
+    You will receive your bonus of 200 tokens (equal to $2.00) within 1 week if your application is successful.
+{{ endif }}
+{{ if player.apply == 0 }}
+    You chose not to apply for the job.
+    Since your productivity value is {{ player.productivity_value }},
+    you will earn a bonus equal to {{ player.productivity_value }} tokens.
+    The cash equivalent of this is ${{ dollar_value }}. The bonus will be credited to your account within 1 week.
+{{ endif }}
+</p>
+Click on 'next' to be redirected back to Prolific.
+
+    {{ next_button }}
+{{ endblock }}
+
+

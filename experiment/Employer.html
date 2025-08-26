@@ -1,0 +1,83 @@
+{{ block title }}The Employer (Instructions Page 4/4){{ endblock }}
+
+{{ block styles }}
+<style>
+/* Container */
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+/* Headings */
+h3 { margin-top: 1.5em; color: #000; }  /* Titles in black */
+
+/* Paragraphs and lists */
+p, ol { font-size: 16px; line-height: 1.5; }
+
+/* Robot sections */
+.robot-section { display: flex; flex-wrap: wrap; align-items: flex-start; margin: 30px 0; }
+.robot-section h3 { flex: 1 1 100%; margin-bottom: 10px; }
+
+/* Image styling */
+.robot-image { text-align: center; }
+.robot-image img { max-width: 150px; /* much smaller */ height: auto; }
+
+/* Description styling */
+.robot-description { flex: 1 1 45%; padding-top: 1em; }
+
+/* Separator */
+hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
+
+/* Next button */
+.next-button { text-align: center; margin: 30px 0; }
+</style>
+{{ endblock }}
+
+{{ block content }}
+<div class="container">
+
+  <p>The employer uses a <b>computer robot</b> to make hiring decisions. Before the study begins, the employer <b>randomly selects</b> one of two possible robot types and uses that robot for <b>all hiring decisions.</b><br>
+  <b>You do not know which robot type is selected.</b></p>
+
+  <!-- Robot A Section -->
+  <section class="robot-section">
+    <h3>Robot A</h3>
+    <div class="robot-image">
+      <img src="{% static 'RobotA.png' %}" alt="Robot A">
+    </div>
+    <div class="robot-description">
+      Uses a <em>systematic adjustment protocol</em>:
+      <ul>
+        <li><b>Reduces Green</b> applicant signals by <b>50 points</b></li>
+        <li>Then hires the 4 applicants with <b>highest adjusted signals</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- Robot B Section -->
+  <section class="robot-section">
+    <h3>Robot B</h3>
+    <div class="robot-image">
+      <img src="{% static 'RobotB.png' %}" alt="Robot B">
+    </div>
+    <div class="robot-description">
+      Uses <em>advanced statistical modeling</em>:
+      <ul>
+        <li>Predicts <b>expected average productivity</b> by group</li>
+        <li>Then combines this with individual <b>signals</b> and group <b>color</b> to <b>estimate each applicant’s actual productivity</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+
+
+  <h4>Important:</h4>
+  <ol>
+    <li>The employer chooses Robot A or Robot B with equal probability at the beginning of the game.</li>
+    <li>The <b>same robot</b> is used to evaluate all applicants from your society.</li>
+  </ol>
+
+    <div class="next-button">
+    {{ next_button }}
+  </div>
+
+</div>
+{{ endblock }}

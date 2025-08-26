@@ -1,0 +1,41 @@
+{{ block title }}
+    Introduction
+{{ endblock }}
+
+{{ block content }}
+Please answer the below to move to the instructions.
+<!-- Honeypot (invisible to humans, visible to bots) -->
+<div style="position: absolute; left: -9999px; top: -9999px; visibility: hidden;">
+    <input type="text" name="website" tabindex="-1" autocomplete="off">
+</div>
+
+<!-- Human verification (visible) -->
+<div class="verification">
+    <p>What is <strong>15 + 7</strong>?</p>
+    <input type="text" name="math_answer" required>
+</div>
+
+<!-- Hidden tracking fields -->
+<input type="hidden" name="completion_time" id="completion-time">
+<input type="hidden" name="interaction_data" id="interaction-data">
+
+<script>
+const startTime = Date.now();
+let interactions = {mouse: 0, keyboard: 0, focus: 0};
+
+// Track human-like behavior
+document.addEventListener('mousemove', () => interactions.mouse++);
+document.addEventListener('keydown', () => interactions.keyboard++);
+document.addEventListener('focusin', () => interactions.focus++);
+
+// On form submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    document.getElementById('completion-time').value = Date.now() - startTime;
+    document.getElementById('interaction-data').value = JSON.stringify(interactions);
+});
+</script>
+<br>
+    {{ next_button }}
+{{ endblock }}
+
+

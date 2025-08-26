@@ -1,0 +1,36 @@
+{{ block title }}
+    Welcome & Consent
+{{ endblock }}
+{{ block content }}
+<p>Thank you for taking part in this experiment.
+    The experiment will last approximately 12 minutes and you will receive a participation fee of $1.50.
+    <!-- During the experiment, you will make a number of decisions, one of which will determine your bonus payment.</p> -->
+During the experiment, you will make a decision which will determine your bonus payment.</p>
+<p><b>We strongly recommend that you complete this study using a laptop/desktop computer.</b></p>
+<h4>Consent</h4>
+ <p>   All data collected in this experiment is anonymized. Only anonymous data may be shared in open
+    science repositories. At any point in the experiment, you may opt out and return your submission. Incomplete
+    experiments will be discarded before analysis.</p>
+
+<p><b>All information in this experiment referring to other participants is true
+        and relates to real human participants.</b>
+    The decisions which you make in this experiment may impact your own remuneration and the remuneration of other
+    individuals. </p>
+<p>There are no known risks to this experiment and you are not required to provide any
+    personally identifiable information.</p>
+<p>
+    This study has received ethical approval from the Norwegian School of Economics'
+    Institutional Review Board.
+    Should you have any further questions regarding this study, please contact ethan.oleary@nhh.no.</p>
+    <p>
+        Should you agree to these terms, please indicate your consent below.
+    If you disagree, you may withdraw now by closing your browser and returning your submission.</p>
+
+    <input type="checkbox" style="margin-right: 10px;" name="consent" value=1><b>I agree to participating in this
+    experiment and understand how the data I provide will be used.</b>
+<br>
+<br>
+{{ formfield_errors 'consent' }}
+    {{ next_button }}
+
+{{ endblock }}
