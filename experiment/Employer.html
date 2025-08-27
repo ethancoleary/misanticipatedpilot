@@ -33,7 +33,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
 {{ block content }}
 <div class="container">
 
-  <p>The employer uses a <b>computer robot</b> to make hiring decisions. Before the study begins, the employer <b>randomly selects</b> one of two possible robot types and uses that robot for <b>all hiring decisions.</b><br>
+  <p>The employer uses a <b>computer robot</b> to make hiring decisions. Before the study begins, the employer <b>selects</b> one of two robots to use for <b>all hiring decisions.</b><br>
   <b>You do not know which robot type is selected.</b></p>
 
   <!-- Robot A Section -->
@@ -61,8 +61,8 @@ hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
     <div class="robot-description">
       Uses <em>advanced statistical modeling</em>:
       <ul>
-        <li>Predicts <b>expected average productivity</b> by group</li>
-        <li>Then combines this with individual <b>signals</b> and group <b>color</b> to <b>estimate each applicant’s actual productivity</b>.</li>
+        <li>Uses all available information (signal, color and the expected average productivity value of applicants from each group) to estimate each applicant’s actual productivity.</li>
+        <li>Hires the 4 applicants with the highest predicted productivity.</li>
       </ul>
     </div>
   </section>
@@ -71,7 +71,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 40px 0; }
 
   <h4>Important:</h4>
   <ol>
-    <li>The employer chooses Robot A or Robot B with equal probability at the beginning of the game.</li>
+    <li>The employer chooses Robot A or Robot B at the beginning of the game.</li>
     <li>The <b>same robot</b> is used to evaluate all applicants from your society.</li>
   </ol>
 

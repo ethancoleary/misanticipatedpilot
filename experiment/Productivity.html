@@ -51,10 +51,11 @@
     <div class="reveal-content">
       <h3>The Productivity Urn:</h3>
       <div class="urn-image-container">
-        <img src="{% static 'productivity_urn_single.png' %}" alt="Productivity Urn" class="urn-image"><br>
+
         <center>
           Productivity Urn<br>1000 balls<br>Average ball value: 100
         </center>
+         <img src="{% static 'productivity_urn_single.png' %}" alt="Productivity Urn" class="urn-image"><br>
       </div>
       <div class="urn-description">
         <ul>
@@ -66,7 +67,7 @@
           <li>The average number of all the balls in the urn is <strong>100</strong>.</li>
         </ul>
       </div>
-      <p>Each participant draws <strong>one ball</strong>; that is your <strong>productivity value</strong>.</p>
+      <p>Each participant in your society draws <strong>one ball</strong> from this urn; that is their <strong>productivity value</strong>.</p>
     </div>
   </div>
 
@@ -118,19 +119,32 @@
   <!-- Section 4 -->
   <div class="reveal-section" id="section4">
     <div class="reveal-header disabled" onclick="revealSection(4)">
-      <div><span class="step-number" id="step4">4</span><span class="reveal-title">Your Application Decision (Decision 1)</span></div>
+      <div><span class="step-number" id="step4">4</span><span class="reveal-title">Your Application Decision
+        <!--(Decision 1)--></span></div>
       <span class="reveal-arrow">▶</span>
     </div>
     <div class="reveal-content">
       <div class="decision-explanation">
-        <h4>Your application decision (Decision 1)</h4>
+        <h4>Your application decision
+          <!--(Decision 1)-->
+        </h4>
         <p>You must first decide if you wish to apply for a job.</p>
-        <p>If you choose <strong>not to apply</strong>, your bonus equals your productivity value ({{ player.productivity_value }} tokens).</p>
+        <p>If you choose <strong>not to apply</strong>, your bonus amount will equal your productivity value or 0 (whichever is higher)</p>
         <p>If you choose to <strong>apply</strong>, the employer hires <strong>4 applicants</strong>:
-           hired = 200 tokens; not hired = 0 tokens.</p>
+           <ul>
+        <li>If you are hired, your bonus will equal 200 tokens.</li>
+        <li>If you are not hired, your bonus will equal 0 tokens.</li>
+      </ul></p>
         <p>Next page: How the employer chooses hires.</p>
         <div id="nextButtonContainer" style="display:none; text-align:center; margin-top:30px;">
-          {{ next_button }}
+
+<form method="post">
+
+  <!-- hidden field for slider value -->
+  <input type="hidden" name="slider" id="slider" style="display:none;">
+
+  {{ next_button }}
+</form>
         </div>
       </div>
     </div>
@@ -139,32 +153,51 @@
 
 
 <script>
-// Progressive reveal
-let currentSection=0, revealed=[false,false,false,false];
-function revealSection(n){
-  if(n>currentSection+1) return;
-  if(revealed[n-1]) return;
-  // visuals
-  const sec=document.getElementById(`section${n}`),
-        hdr=sec.querySelector('.reveal-header'),
-        cnt=sec.querySelector('.reveal-content'),
-        arr=sec.querySelector('.reveal-arrow'),
-        stp=sec.querySelector('.step-number');
-  hdr.classList.add('active'); hdr.classList.remove('disabled');
-  cnt.classList.add('show'); arr.classList.add('rotated');
+let currentSection = 0;
+let revealed = [false, false, false, false];
+
+function revealSection(n) {
+  if (n > currentSection + 1) return;
+  if (revealed[n - 1]) return;
+
+  const sec = document.getElementById(`section${n}`);
+  const hdr = sec.querySelector('.reveal-header');
+  const cnt = sec.querySelector('.reveal-content');
+  const arr = sec.querySelector('.reveal-arrow');
+  const stp = sec.querySelector('.step-number');
+
+  hdr.classList.add('active');
+  hdr.classList.remove('disabled');
+  cnt.classList.add('show');
+  arr.classList.add('rotated');
   stp.classList.add('completed');
-  revealed[n-1]=true; currentSection=n;
-  if(n<4) document.querySelector(`#section${n+1} .reveal-header`).classList.remove('disabled');
-  if(n===4) document.getElementById('nextButtonContainer').style.display='block';
-  if(n===2){
-    setTimeout(()=>{
-      drawProductivityChart();
-      document.getElementById('productivitySlider').addEventListener('input', updateProductivityDisplay);
-    },100);
+
+  revealed[n - 1] = true;
+  currentSection = n;
+
+  if (n < revealed.length) {
+    const nextHdr = document.querySelector(`#section${n + 1} .reveal-header`);
+    if (nextHdr) nextHdr.classList.remove('disabled');
+  }
+  if (n === revealed.length) {
+    document.getElementById('nextButtonContainer').style.display = 'block';
+  }
+  if (n === 2) {
+    drawProductivityChart();
+    const slider = document.getElementById('productivitySlider');
+    const hiddenInput = document.getElementById('slider');
+
+    hiddenInput.value = slider.value;
+    updateProductivityDisplay();
+
+    slider.addEventListener('input', () => {
+      hiddenInput.value = slider.value;
+      updateProductivityDisplay();
+    });
   }
 }
 
-// CDF helper
+// CDF helper functions...
 const PRODUCTIVITY_MEAN=100, PRODUCTIVITY_SD=100;
 function normalCDF(x,mean,sd){
   const z=(x-mean)/sd; return .5*(1+erf(z/Math.sqrt(2)));
@@ -177,7 +210,6 @@ function erf(x){
   return sign*y;
 }
 
-// Update slider display
 function updateProductivityDisplay(){
   const v=parseInt(document.getElementById('productivitySlider').value),
         p=normalCDF(v,PRODUCTIVITY_MEAN,PRODUCTIVITY_SD),
@@ -190,7 +222,6 @@ function updateProductivityDisplay(){
   drawProductivityChart(v);
 }
 
-// Draw histogram with ticks
 function drawProductivityChart(highlight=null){
   const c=document.getElementById('productivityChart'), ctx=c.getContext('2d'),
         W=c.width, H=c.height-50;
@@ -205,16 +236,13 @@ function drawProductivityChart(highlight=null){
     ctx.fillStyle=(highlight!==null&&x<=highlight)?'#ff9800':'#2196f3';
     ctx.fillRect(i*bW, H-h, bW-1, h);
   }
-  // highlight line
   if(highlight!==null){
     const lx=((highlight-minX)/(maxX-minX))*W;
     ctx.strokeStyle='#f44336'; ctx.lineWidth=3;
     ctx.beginPath();ctx.moveTo(lx,0);ctx.lineTo(lx,H);ctx.stroke();
   }
-  // x-axis
   ctx.strokeStyle='#000'; ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(W,H);ctx.stroke();
-  // ticks & labels
   const ticks=[0,50,100,150,200];
   ctx.fillStyle='#000'; ctx.font='12px Arial';
   ticks.forEach(val=>{
@@ -223,10 +251,10 @@ function drawProductivityChart(highlight=null){
     const txt=val.toString(),tw=ctx.measureText(txt).width;
     ctx.fillText(txt, xPos-tw/2, H+20);
   });
-  // y-axis label
   ctx.save();ctx.rotate(-Math.PI/2);
   ctx.fillText('Frequency of ball numbers', -H/2-20, 15);
   ctx.restore();
 }
 </script>
+
 {{ endblock }}

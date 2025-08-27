@@ -18,15 +18,15 @@ class C(BaseConstants):
     variance_signal = 10000
     tokens_to_dollars = 0.01
     PLAYERS_PER_GROUP = None
-    CORRECT_ANSWERS = [3, 3, 1, 2, 2, 2]
+    CORRECT_ANSWERS = [3, 3, 1, 3, 2, 2]
     CORRECT_ANSWERS2 = [2, 3, 3]
     ERROR_MESSAGES = [
         'Your answer to question 1 is wrong. Your society consists of 16 people (including you!).',
         'Your answer to question 2 is wrong. Everyone draws a productivity value from the same urn where the average ball number is 100.',
         'Your answer to question 3 is wrong. You can draw a negative value (the probability of this happening is 15.9%).',
-        'Your answer to question 4 is wrong. Each person has their own signal urn.',
+        'Your answer to question 4 is wrong. Signals are made by adding the numbers drawn from the productivity and noise urns.',
         'Your answer to question 5 is wrong. 4 individuals will be hired.',
-        'Your answer to question 6 is wrong. Your signal urn is specifically tailored to your productivity value.'
+        'Your answer to question 6 is wrong. The noise urn contains negative valued numbers so your signal can be less than your productivity value.'
     ]
     ERROR_MESSAGES2 = [
         'Your answer to question 7 is wrong. Robot A first subtracts 50 from each signal of Green applicants.',
@@ -50,7 +50,7 @@ class Player(BasePlayer):
     math_answer = models.StringField()  # Human verification math question
     completion_time = models.IntegerField()  # Time taken to complete page
     interaction_data = models.StringField()  # JSON string of mouse/keyboard data
-
+    slider = models.IntegerField(blank=True)
     # Existing fields...
     human_check = models.StringField(blank=True)  # You can remove this old one
     color = models.IntegerField(
@@ -78,14 +78,11 @@ class Player(BasePlayer):
     incorrect2 = models.IntegerField(initial=0)
     quiz_q3 = models.IntegerField(choices=[[1, 'TRUE'], [2, 'FALSE']], label='Negative productivity possible?', widget=widgets.RadioSelect)
     incorrect3 = models.IntegerField(initial=0)
-    quiz_q4 = models.IntegerField(choices=[[1, 'TRUE'], [2, 'FALSE']], label='Same signal urn?', widget=widgets.RadioSelect)
+    quiz_q4 = models.IntegerField(choices=[[1, 'Signals are drawn from an urn with mean 0'], [2, 'Signals are equal to productivity values plus 100'], [3, 'Signals are equal to productivity values plus a draw from the noise urn']], label='Same signal urn?', widget=widgets.RadioSelect)
     incorrect4 = models.IntegerField(initial=0)
     quiz_q5 = models.IntegerField(choices=[[1, '2'], [2, '4'], [3, '5'], [4, '8']], label='Number hired', widget=widgets.RadioSelect)
     incorrect5 = models.IntegerField(initial=0)
-    quiz_q6 = models.IntegerField(
-        choices=[[1, 'Same as everyone\'s'], [2, 'Centered on your productivity'], [3, 'Random'], [4, 'Only on group']],
-        label='Your signal urn', widget=widgets.RadioSelect
-    )
+    quiz_q6 = models.IntegerField(choices=[[1, 'TRUE'], [2, 'FALSE']], label='Negative signal', widget=widgets.RadioSelect)
     incorrect6 = models.IntegerField(initial=0)
 
     quiz_q7 = models.IntegerField(choices=[[1, 'Adds 50 points'], [2, 'Subtracts 50 points'],
@@ -126,7 +123,7 @@ class Intro(Page):
 
             # Check completion time (too fast = bot)
             completion_time = int(player_data.get('completion_time', 0))
-            if completion_time < 5000:  # Less than 5 seconds
+            if completion_time < 1000:  # Less than 5 seconds
                 return True
 
             # Check interaction data
@@ -178,7 +175,8 @@ class Color(Page):
         player.productivity_value = math.ceil(random.gauss(100,100))
 
 class Productivity(Page):
-    pass
+    form_model = 'player'
+    form_fields = ['slider']
 
 class Signal(Page):
 
@@ -305,7 +303,7 @@ page_sequence = [
     Color,
     Productivity,
     Signal,
-    Quiz1,
+    #Quiz1,
     Employer,
     Quiz2,
     Decision1,

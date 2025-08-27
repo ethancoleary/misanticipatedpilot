@@ -27,7 +27,7 @@
 
 /* --- Dual-urn table ----------------------------------------------------- */
 .signal-table      { width:100%;border-collapse:collapse;border:1px solid #ddd; }
-.signal-table td   { border:1px solid #ddd;padding:20px;vertical-align:top; }
+.signal-table td   { border:1px solid #ddd;padding:20px;vertical-align:top; width: 50%;}
 .image-row         { background:#ffffff;text-align:center; }
 
 .urn-diagram-container        { position:relative;display:inline-block; }
@@ -66,28 +66,20 @@
 {{ block content }}
 <div class="container">
 
-<p>The <b>employer</b> never sees your true productivity value.
-Instead, they observe a <b>signal</b> – a noisy estimate of that value.</p>
+<p>When deciding which applicants to hire, the <b>employer</b> does not see your true productivity value.
+Instead, they observe a <b>signal</b>. This <b>signal</b> is the sum of the number drawn from your productivity urn and the number drawn from another urn - the Noise Urn. Read more about this below.</p>
 
 <!-- ========== SECTION 1 ================================================= -->
 <div class="reveal-section" id="section1">
   <div class="reveal-header" onclick="revealSection(1)">
       <div><span class="step-number" id="step1">1</span>
-           <span class="reveal-title">Productivity vs Signal Urns</span></div>
+           <span class="reveal-title">Productivity vs Noise Urn</span></div>
       <span class="reveal-arrow">▶</span>
   </div>
 
   <div class="reveal-content">
       <!-- Dual-urn table -->
       <table class="signal-table">
-    <!-- Row 1: Image row (was previously Row 2) -->
-    <tr class="image-row"><td colspan="2">
-        <div class="urn-diagram-container">
-            <img src="{% static 'signal_urn.png' %}" alt="Productivity and Signal Urns" class="urn-image">
-            <div class="productivity-value-label">{{ player.productivity_value }}</div>
-            <div class="signal-average-label">{{ player.productivity_value }}</div>
-        </div>
-    </td></tr>
 
     <!-- Row 2: Content columns (was previously Row 3) -->
     <tr class="content-row">
@@ -100,25 +92,29 @@ Instead, they observe a <b>signal</b> – a noisy estimate of that value.</p>
 
         <!-- Right cell - NOW BLUE SHADED -->
         <td class="right-col-blue">
-            <p class="center"><b>YOUR Signal Urn</b><br>
+            <p class="center"><b>Noise Urn</b><br>
                1 000 balls<br>
-               Average = {{ player.productivity_value }}</p>
+               Average = 0</p>
         </td>
     </tr>
+          <tr class="image-row"><td colspan="2">
+        <div class="urn-diagram-container">
+            <img src="{% static 'signal.png' %}" alt="Productivity and Noise Urns" class="urn-image">
+        </div>
+    </td></tr>
 </table>
 <p>
       <ol>
           <li>You drew <b>{{ player.productivity_value }}</b> from the productivity urn.</li>
-          <li>Now imagine a <b>second urn</b> created specifically for you:</li>
+          <li>Now imagine a <b>second urn</b> also containing 1000 balls with numbers on them called the <b>noise urn</b>:</li>
           <ol>
-              <li>This second urn contains <b>1,000 balls</b>.</li>
-              <li>The <b>average ball number</b> in your second urn equals your productivity value {{ player.productivity_value }}.</li>
-              <li>The numbers are <b>spread around</b> your productivity value (some higher, some lower but most are close to the average).</li>
-              <li><b>Half the balls</b> have numbers <b>at or below</b> your productivity value.</li>
-              <li><b>Half the balls</b> have numbers <b>at or above</b> your productivity value.</li>
-              <li><b>683 balls</b> have numbers between {{ prod_min }} and {{ prod_max }}.</li>
+              <li>The <b>average ball number</b> in the noise urn is 0.</li>
+              <li>The numbers are <b>spread around</b> 0 (some negative, some positive but most are close to 0).</li>
+              <li><b>Half the balls</b> have numbers <b>at or below</b> 0.</li>
+              <li><b>Half the balls</b> have numbers <b>at or above</b> 0.</li>
+              <li><b>683 balls</b> have numbers between -100 and 100.</li>
           </ol>
-          <li>If you apply, the employer draws <b>one</b> ball from that urn; that draw is your <b>signal</b>.</li>
+          <li>If you apply, a ball is drawn from the noise urn and the number on that ball is added to your productivity value to make your <b>signal</b>.</li>
       </ol>
       </p>
   </div>
@@ -133,8 +129,9 @@ Instead, they observe a <b>signal</b> – a noisy estimate of that value.</p>
   </div>
 
   <div class="reveal-content">
-      <p><em>This tool is calibrated specifically to your productivity value ({{ player.productivity_value }}).
-          Use it to explore your personal signal distribution: slide to any value and see how many of the 1,000 balls in YOUR signal urn are above or below that number.</em></p>
+      <p><em>This tool is calibrated specifically to you.
+          Use it to explore the distribution of signals you can get. The signal is your productivity value ({{ player.productivity_value }}) plus the number on the ball you draw from the noise urn.<br><br>
+      You can read the numbers below as the following: since there are 500 balls which can make your signal at or below {{ player.productivity_value }}, then there is a 50% chance that your signal is less {{ player.productivity_value }}.</em></p>
 
       <div class="histogram-container"><canvas id="signalChart" width="600" height="300"></canvas></div>
 
@@ -149,11 +146,11 @@ Instead, they observe a <b>signal</b> – a noisy estimate of that value.</p>
 
       <div class="results-display">
           <div class="result-box">
-              <span class="result-label">Balls at or below <span id="belowVal">{{ player.productivity_value }}</span>:</span>
+              <span class="result-label">Number of balls that can make your <br> signal at or below <span id="belowVal">{{ player.productivity_value }}</span>:</span>
               <span class="result-number orange" id="ballsBelow">500</span>
           </div>
           <div class="result-box">
-              <span class="result-label">Balls above <span id="aboveVal">{{ player.productivity_value }}</span>:</span>
+              <span class="result-label">Number of balls that can make your <br> signal at or above  <span id="aboveVal">{{ player.productivity_value }}</span>:</span>
               <span class="result-number" id="ballsAbove">500</span>
           </div>
       </div>
@@ -170,9 +167,8 @@ Instead, they observe a <b>signal</b> – a noisy estimate of that value.</p>
 
   <div class="reveal-content">
       <ul style="list-style:disc;padding-left:25px;">
-          <li>For each applicant, the employer sees only <b>Group colour</b> and <b>Signal</b>.</li>
+          <li>For each applicant, the employer sees only <b>group colour</b> and <b>signal</b>.</li>
           <li>Your true productivity remains hidden.</li>
-          <li>You never see which signal the employer draws.</li>
       </ul>
 
       <!-- NEXT button appears here after Section 3 opens -->
